@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,6 +53,12 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+                football: {
+                    pink: '#FFB6C1',
+                    gold: '#F6BE00',
+                    dark: '#121212',
+                    light: '#FFFFFF',
+                },
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -89,7 +96,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+			},
+            backgroundImage: {
+              'football-pattern': "url('/public/lovable-uploads/96019cfe-0431-4e4d-8c3d-2a14a178de03.png')",
+            },
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
