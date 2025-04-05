@@ -16,7 +16,7 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md p-8 rounded-lg bg-football-pink">
+    <div className="w-full max-w-lg p-8 rounded-lg bg-football-pink">
       <div className="flex justify-center mb-6">
         <Logo />
       </div>
@@ -66,8 +66,10 @@ const RegisterForm = () => {
         </Button>
       </form>
       <div className="mt-4 text-center">
-        <a href="/login" className="text-blue-800 hover:underline">
-          Login
+        <a href="/login">
+          <Button variant="outline" className="bg-transparent hover:bg-blue-800 text-blue-800 hover:text-white border border-blue-800">
+            Login
+          </Button>
         </a>
       </div>
     </div>
