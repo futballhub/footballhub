@@ -3,19 +3,53 @@ import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from '@/hooks/use-toast';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const from = location.state?.from || '/';
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ email, password });
-    // In a real app, this would connect to backend authentication
+    setIsLoading(true);
+
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        toast({
+          title: "Success!",
+          description: "You have successfully logged in.",
+        });
+        navigate(from, { replace: true });
+      } else {
+        toast({
+          title: "Login failed",
+          description: "Invalid email or password. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An error occurred during login.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="w-full max-w-lg p-8 rounded-lg bg-football-pink">
+    <div className="w-full max-w-xl p-8 rounded-lg bg-football-pink">
       <div className="flex justify-center mb-6">
         <Logo />
       </div>
@@ -32,6 +66,7 @@ const LoginForm = () => {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border-gray-300 bg-white"
             placeholder="Enter your email address"
+            required
           />
         </div>
         <div className="space-y-2">
@@ -45,18 +80,26 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border-gray-300 bg-white"
             placeholder="Enter your password"
+            required
           />
         </div>
-        <Button type="submit" className="w-full bg-orange-400 hover:bg-orange-500 text-black font-bold py-2">
-          Login
+        <Button 
+          type="submit" 
+          className="w-full bg-orange-400 hover:bg-orange-500 text-black font-bold py-2"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging in...' : 'Login'}
         </Button>
       </form>
-      <div className="mt-4 text-center">
-        <a href="/register">
-          <Button variant="outline" className="bg-transparent hover:bg-blue-800 text-blue-800 hover:text-white border border-blue-800">
-            Register new account
-          </Button>
-        </a>
+      <div className="mt-6 text-center">
+        <p className="mb-2">Don't have an account?</p>
+        <Button 
+          variant="outline" 
+          className="bg-transparent hover:bg-blue-800 text-blue-800 hover:text-white border border-blue-800 w-full"
+          onClick={() => navigate('/register')}
+        >
+          Register new account
+        </Button>
       </div>
     </div>
   );
