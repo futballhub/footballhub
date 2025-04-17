@@ -6,6 +6,7 @@ type User = {
   username: string;
   email: string;
   provider?: string;
+  profilePicture?: string;
 };
 
 type AuthContextType = {
@@ -19,14 +20,26 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Mock Google auth response
-interface GoogleAuthResponse {
-  user: {
-    id: string;
-    name: string;
-    email: string;
-  };
-}
+// Google OAuth Client ID
+const GOOGLE_CLIENT_ID = '801856078058-9jkp14gahkunnb6o6vfncdb2up4emu9g.apps.googleusercontent.com';
+
+// Load the Google API script
+const loadGoogleScript = () => {
+  return new Promise<void>((resolve) => {
+    if (document.querySelector('script#google-login')) {
+      resolve();
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.id = 'google-login';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => resolve();
+    document.body.appendChild(script);
+  });
+};
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -35,6 +48,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   const isAuthenticated = Boolean(user);
+
+  useEffect(() => {
+    // Load the Google API script when the component mounts
+    loadGoogleScript();
+  }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
@@ -81,34 +99,74 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const loginWithGoogle = async (): Promise<boolean> => {
-    try {
-      // Mock Google login - in a real app, this would use the Google OAuth API
-      // Simulating a successful Google login
-      const mockGoogleResponse: GoogleAuthResponse = {
-        user: {
-          id: 'google-123456',
-          name: 'Google User',
-          email: 'googleuser@example.com'
+    return new Promise((resolve) => {
+      if (!window.google) {
+        console.error('Google API not loaded');
+        resolve(false);
+        return;
+      }
+
+      const handleCredentialResponse = (response: any) => {
+        // Decode the JWT token to get user information
+        if (response.credential) {
+          const decodedToken = decodeJwtResponse(response.credential);
+          console.log("Decoded JWT ID token:", decodedToken);
+          
+          const googleUser: User = {
+            id: decodedToken.sub,
+            username: decodedToken.name,
+            email: decodedToken.email,
+            provider: 'google',
+            profilePicture: decodedToken.picture
+          };
+          
+          setUser(googleUser);
+          localStorage.setItem('footballhub_user', JSON.stringify(googleUser));
+          resolve(true);
+        } else {
+          console.error('No credential received from Google');
+          resolve(false);
         }
       };
-      
-      const googleUser: User = {
-        id: mockGoogleResponse.user.id,
-        username: mockGoogleResponse.user.name,
-        email: mockGoogleResponse.user.email,
-        provider: 'google'
-      };
-      
-      setUser(googleUser);
-      localStorage.setItem('footballhub_user', JSON.stringify(googleUser));
-      return true;
-    } catch (error) {
-      console.error('Google login failed:', error);
-      return false;
-    }
+
+      // Initialize Google Sign-In
+      window.google?.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+        auto_select: false,
+      });
+
+      // Prompt the One Tap UI
+      window.google?.accounts.id.prompt((notification: any) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          // Try rendering the button manually if One Tap doesn't show
+          window.google?.accounts.id.renderButton(
+            document.getElementById("google-login-button") || document.createElement('div'),
+            { theme: 'outline', size: 'large' }
+          );
+          resolve(false);
+        }
+      });
+    });
+  };
+
+  // Function to decode the JWT token received from Google
+  const decodeJwtResponse = (token: string) => {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
   };
 
   const logout = () => {
+    if (window.google && user?.provider === 'google') {
+      window.google.accounts.id.disableAutoSelect();
+    }
     setUser(null);
     localStorage.removeItem('footballhub_user');
   };
@@ -127,3 +185,19 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Add the Google object to the window type
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: any) => void;
+          prompt: (callback: (notification: any) => void) => void;
+          renderButton: (element: HTMLElement, options: any) => void;
+          disableAutoSelect: () => void;
+        };
+      };
+    };
+  }
+}
