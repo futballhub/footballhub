@@ -21,9 +21,10 @@ const Navbar = () => {
           <Logo />
         </Link>
         <div className="hidden md:flex space-x-6">
-          <Link to="/" className="hover:text-football-gold">Home</Link>
+         
           {isAuthenticated && (
             <>
+              <Link to="/" className="hover:text-football-gold">Home</Link>
               <Link to="/news" className="hover:text-football-gold">News</Link>
               <Link to="/videos" className="hover:text-football-gold">Videos</Link>
               <Link to="/stats" className="hover:text-football-gold">Stats</Link>
@@ -36,8 +37,7 @@ const Navbar = () => {
             <>
               <span className="text-football-gold mr-2">Welcome, {user?.username}</span>
               <Button 
-                variant="outline" 
-                className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                className="bg-football-gold text-black hover:bg-amber-400"
                 onClick={handleLogout}
               >
                 Logout
@@ -46,7 +46,7 @@ const Navbar = () => {
           ) : (
             <>
               <Link to="/login">
-                <Button variant="outline" className="border-football-gold text-football-gold hover:bg-football-gold hover:text-black">
+                <Button  className="bg-football-gold text-black hover:bg-amber-400">
                   Login
                 </Button>
               </Link>
