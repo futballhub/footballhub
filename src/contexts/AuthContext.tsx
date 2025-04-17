@@ -1,10 +1,11 @@
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 type User = {
   id: string;
   username: string;
   email: string;
+  provider?: string;
 };
 
 type AuthContextType = {
@@ -12,10 +13,20 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<boolean>;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Mock Google auth response
+interface GoogleAuthResponse {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -32,7 +43,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const mockUser = {
           id: '1',
           username: email.split('@')[0],
-          email: email
+          email: email,
+          provider: 'email'
         };
         
         setUser(mockUser);
@@ -53,7 +65,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const mockUser = {
           id: '1',
           username: username,
-          email: email
+          email: email,
+          provider: 'email'
         };
         
         setUser(mockUser);
@@ -67,13 +80,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const loginWithGoogle = async (): Promise<boolean> => {
+    try {
+      // Mock Google login - in a real app, this would use the Google OAuth API
+      // Simulating a successful Google login
+      const mockGoogleResponse: GoogleAuthResponse = {
+        user: {
+          id: 'google-123456',
+          name: 'Google User',
+          email: 'googleuser@example.com'
+        }
+      };
+      
+      const googleUser: User = {
+        id: mockGoogleResponse.user.id,
+        username: mockGoogleResponse.user.name,
+        email: mockGoogleResponse.user.email,
+        provider: 'google'
+      };
+      
+      setUser(googleUser);
+      localStorage.setItem('footballhub_user', JSON.stringify(googleUser));
+      return true;
+    } catch (error) {
+      console.error('Google login failed:', error);
+      return false;
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('footballhub_user');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, register, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
