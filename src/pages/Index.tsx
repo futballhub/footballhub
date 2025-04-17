@@ -42,12 +42,12 @@ const Index = () => {
       <Navbar />
       
       {/* Hero Section */}
-      <div className="relative w-full h-[500px] bg-football-pattern bg-cover bg-center">
-        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to <span className="text-white bg-black px-4 py-2 rounded-md shadow-lg">Football<span className="bg-football-gold px-2 py-0.5 rounded-sm">hub</span></span></h1>
+      <div className="relative w-full h-[500px] bg-football-pattern bg-cover bg-center ">
+        <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-content-center text-center ">
+          <div className="container mx-auto px-4 ">
+            <h1 className="text-4xl md:text-6xl font-bold mb-3 justify-content-center text-center">Welcome to <span className="text-white bg-black px-4 py-2 rounded-md shadow-lg">Football<span className=" text-black bg-football-gold px-6 py-0.1 rounded-sm ">hub</span></span></h1>
             <p className="text-xl md:text-2xl mb-8 max-w-2xl">Your ultimate destination for football news, videos, stats, and live streaming</p>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 ">
               {!isAuthenticated && (
                 <Link to="/register">
                   <Button className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8">
