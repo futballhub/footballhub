@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,10 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import AuthModal from '@/components/AuthModal';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
 
   // Mock data for featured content
   const featuredMatches = [
@@ -27,20 +30,33 @@ const Index = () => {
 
   const handleAuthenticatedRoute = (path: string) => {
     if (!isAuthenticated) {
-      toast({
-        title: "Authentication Required",
-        description: "Please login to access this feature.",
-        variant: "destructive",
-      });
-      navigate('/login', { state: { from: path } });
+      setAuthModalTab('login');
+      setIsAuthModalOpen(true);
       return false;
     }
     return true;
   };
 
+  const openRegisterModal = () => {
+    setAuthModalTab('register');
+    setIsAuthModalOpen(true);
+  };
+
+  const openLoginModal = () => {
+    setAuthModalTab('login');
+    setIsAuthModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Navbar />
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultTab={authModalTab}
+      />
       
       {/* Hero Section - Only shown when not authenticated */}
       {!isAuthenticated && (
@@ -51,15 +67,22 @@ const Index = () => {
               <p className="text-xl md:text-2xl mb-8 max-w-2xl text-center">Your ultimate destination for football news, videos, stats, and live streaming</p>
               <div className="flex flex-wrap gap-4 justify-center">
                 {!isAuthenticated && (
-                  <Link to="/register">
-                    <Button className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8">
-                      Register Now
-                    </Button>
-                  </Link>
+                  <Button 
+                    className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8"
+                    onClick={openRegisterModal}
+                  >
+                    Register Now
+                  </Button>
                 )}
                 <Button 
                   className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8"
-                  onClick={() => handleAuthenticatedRoute('/live')}
+                  onClick={() => {
+                    if (isAuthenticated) {
+                      navigate('/live');
+                    } else {
+                      openLoginModal();
+                    }
+                  }}
                 >
                   Watch Live Matches
                 </Button>
@@ -76,7 +99,13 @@ const Index = () => {
           <Button 
             variant="link" 
             className="text-football-gold hover:underline"
-            onClick={() => handleAuthenticatedRoute('/live')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                openLoginModal();
+              } else {
+                navigate('/live');
+              }
+            }}
           >
             View All
           </Button>
@@ -93,7 +122,13 @@ const Index = () => {
                 <div className="text-center text-football-gold font-medium">{match.time}</div>
                 <Button 
                   className="w-full mt-4 bg-football-pink hover:bg-pink-400 text-black"
-                  onClick={() => handleAuthenticatedRoute(`/live/${match.id}`)}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      openLoginModal();
+                    } else {
+                      navigate(`/live/${match.id}`);
+                    }
+                  }}
                 >
                   Watch Live
                 </Button>
@@ -110,7 +145,13 @@ const Index = () => {
           <Button 
             variant="link" 
             className="text-football-gold hover:underline"
-            onClick={() => handleAuthenticatedRoute('/news')}
+            onClick={() => {
+              if (!isAuthenticated) {
+                openLoginModal();
+              } else {
+                navigate('/news');
+              }
+            }}
           >
             View All
           </Button>
@@ -124,7 +165,13 @@ const Index = () => {
                 <Button 
                   variant="link" 
                   className="text-football-gold p-0"
-                  onClick={() => handleAuthenticatedRoute(`/news/${news.id}`)}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      openLoginModal();
+                    } else {
+                      navigate(`/news/${news.id}`);
+                    }
+                  }}
                 >
                   Read More
                 </Button>
@@ -154,7 +201,7 @@ const Index = () => {
                     description: "Please login to subscribe to our newsletter.",
                     variant: "destructive",
                   });
-                  navigate('/login');
+                  openLoginModal();
                 } else {
                   toast({
                     title: "Subscribed!",
