@@ -180,8 +180,8 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-white text-black">
-        <DialogHeader className="flex justify-center">
+      <DialogContent className="sm:max-w-md bg-football-pink text-black">
+        <DialogHeader className="flex justify-content-center items-center">
           <Logo />
         </DialogHeader>
         
@@ -223,7 +223,7 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
               </div>
               <Button 
                 type="submit" 
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2"
+                className="w-full bg-blue-500 bg-orange-400 hover:bg-orange-500 font-bold py-2"
                 disabled={isLoading}
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
@@ -238,7 +238,9 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
                 <span className="px-2 bg-white text-gray-500">
                   OR CONTINUE WITH
                 </span>
+
               </div>
+              
             </div>
             
             <div className="mt-6">
@@ -293,7 +295,7 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
               </div>
               <Button 
                 type="submit" 
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2"
+                className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2"
                 disabled={isLoading}
               >
                 {isLoading ? 'Registering...' : 'Register'}

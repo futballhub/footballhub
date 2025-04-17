@@ -1,11 +1,14 @@
-
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 
-const Navbar = () => {
+type NavbarProps = {
+  openLoginModal: () => void;
+};
+
+const Navbar: React.FC<NavbarProps> = ({ openLoginModal }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -20,8 +23,8 @@ const Navbar = () => {
         <Link to="/" className="flex items-center">
           <Logo />
         </Link>
+
         <div className="hidden md:flex space-x-6">
-         
           {isAuthenticated && (
             <>
               <Link to="/" className="hover:text-football-gold">Home</Link>
@@ -32,6 +35,7 @@ const Navbar = () => {
             </>
           )}
         </div>
+
         <div className="flex space-x-4 items-center">
           {isAuthenticated ? (
             <>
@@ -44,16 +48,12 @@ const Navbar = () => {
               </Button>
             </>
           ) : (
-            <>
-              <Link to="/login">
-                <Button className="bg-football-gold text-black hover:bg-amber-400">
-                  Login
-                </Button>
-              </Link>
-              <Link to="/register">
-                <Button className="bg-football-gold text-black hover:bg-amber-400">Register</Button>
-              </Link>
-            </>
+            <Button
+              className="bg-football-gold text-black hover:bg-amber-400"
+              onClick={openLoginModal}
+            >
+              Sign In / Register
+            </Button>
           )}
         </div>
       </div>
