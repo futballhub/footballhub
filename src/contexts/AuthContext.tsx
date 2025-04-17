@@ -14,7 +14,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   register: (username: string, email: string, password: string) => Promise<boolean>;
-  loginWithGoogle: () => Promise<boolean>;
+  loginWithGoogle: (credential: string) => Promise<boolean>;
   logout: () => void;
 };
 
@@ -98,56 +98,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const loginWithGoogle = async (): Promise<boolean> => {
-    return new Promise((resolve) => {
-      if (!window.google) {
-        console.error('Google API not loaded');
-        resolve(false);
-        return;
-      }
-
-      const handleCredentialResponse = (response: any) => {
+  const loginWithGoogle = async (credential: string): Promise<boolean> => {
+    try {
+      if (credential) {
         // Decode the JWT token to get user information
-        if (response.credential) {
-          const decodedToken = decodeJwtResponse(response.credential);
-          console.log("Decoded JWT ID token:", decodedToken);
-          
-          const googleUser: User = {
-            id: decodedToken.sub,
-            username: decodedToken.name,
-            email: decodedToken.email,
-            provider: 'google',
-            profilePicture: decodedToken.picture
-          };
-          
-          setUser(googleUser);
-          localStorage.setItem('footballhub_user', JSON.stringify(googleUser));
-          resolve(true);
-        } else {
-          console.error('No credential received from Google');
-          resolve(false);
-        }
-      };
-
-      // Initialize Google Sign-In
-      window.google?.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleCredentialResponse,
-        auto_select: false,
-      });
-
-      // Prompt the One Tap UI
-      window.google?.accounts.id.prompt((notification: any) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          // Try rendering the button manually if One Tap doesn't show
-          window.google?.accounts.id.renderButton(
-            document.getElementById("google-login-button") || document.createElement('div'),
-            { theme: 'outline', size: 'large' }
-          );
-          resolve(false);
-        }
-      });
-    });
+        const decodedToken = decodeJwtResponse(credential);
+        console.log("Decoded JWT ID token:", decodedToken);
+        
+        const googleUser: User = {
+          id: decodedToken.sub,
+          username: decodedToken.name,
+          email: decodedToken.email,
+          provider: 'google',
+          profilePicture: decodedToken.picture
+        };
+        
+        setUser(googleUser);
+        localStorage.setItem('footballhub_user', JSON.stringify(googleUser));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Google login failed:', error);
+      return false;
+    }
   };
 
   // Function to decode the JWT token received from Google
@@ -196,6 +170,7 @@ declare global {
           prompt: (callback: (notification: any) => void) => void;
           renderButton: (element: HTMLElement, options: any) => void;
           disableAutoSelect: () => void;
+          cancel: () => void;
         };
       };
     };

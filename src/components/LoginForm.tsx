@@ -21,21 +21,87 @@ const LoginForm = () => {
 
   // Initialize Google button when component mounts
   useEffect(() => {
-    if (window.google && googleButtonRef.current) {
-      window.google.accounts.id.renderButton(
-        googleButtonRef.current,
-        {
-          theme: 'outline',
-          size: 'large',
-          type: 'standard',
-          text: 'signin_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          width: '100%',
+    const loadGoogleScript = async () => {
+      try {
+        if (!window.google) {
+          const script = document.createElement('script');
+          script.src = 'https://accounts.google.com/gsi/client';
+          script.async = true;
+          script.defer = true;
+          document.body.appendChild(script);
+          
+          // Wait for script to load
+          await new Promise<void>((resolve) => {
+            script.onload = () => resolve();
+          });
         }
-      );
+        
+        // Initialize Google Sign-In
+        if (window.google && googleButtonRef.current) {
+          window.google.accounts.id.initialize({
+            client_id: '801856078058-9jkp14gahkunnb6o6vfncdb2up4emu9g.apps.googleusercontent.com',
+            callback: handleGoogleResponse,
+            auto_select: false,
+          });
+          
+          window.google.accounts.id.renderButton(
+            googleButtonRef.current,
+            {
+              theme: 'outline',
+              size: 'large',
+              type: 'standard',
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left',
+              width: '100%',
+            }
+          );
+        }
+      } catch (error) {
+        console.error('Error loading Google Sign-In:', error);
+      }
+    };
+    
+    loadGoogleScript();
+    
+    // Clean up
+    return () => {
+      // Cancel One Tap prompt
+      window.google?.accounts.id.cancel();
+    };
+  }, []);
+
+  const handleGoogleResponse = async (response: any) => {
+    if (response.credential) {
+      setIsGoogleLoading(true);
+      try {
+        const success = await loginWithGoogle(response.credential);
+        
+        if (success) {
+          toast({
+            title: "Success!",
+            description: "You have successfully logged in with Google.",
+          });
+          navigate(from, { replace: true });
+        } else {
+          toast({
+            title: "Error",
+            description: "Google login failed. Please try again.",
+            variant: "destructive",
+          });
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "An error occurred during Google login.",
+          variant: "destructive",
+        });
+        console.error('Google login error:', error);
+      } finally {
+        setIsGoogleLoading(false);
+      }
     }
-  }, [googleButtonRef, window.google]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,32 +131,6 @@ const LoginForm = () => {
       });
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setIsGoogleLoading(true);
-    try {
-      const success = await loginWithGoogle();
-      
-      if (success) {
-        toast({
-          title: "Success!",
-          description: "You have successfully logged in with Google.",
-        });
-        navigate(from, { replace: true });
-      } else {
-        // This will not be shown as the Google popup will handle authentication
-        console.log("Waiting for Google authentication...");
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred during Google login.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGoogleLoading(false);
     }
   };
 
@@ -150,17 +190,7 @@ const LoginForm = () => {
       </div>
       
       <div className="mt-6">
-        {/* Hidden button for manual trigger */}
-        <Button
-          type="button"
-          className="hidden"
-          onClick={handleGoogleLogin}
-          disabled={isGoogleLoading}
-        >
-          Login with Google
-        </Button>
-        
-        {/* Container for Google Sign-In button */}
+        {/* Google Sign-In button container */}
         <div id="google-login-button" ref={googleButtonRef} className="w-full flex justify-center"></div>
       </div>
       
