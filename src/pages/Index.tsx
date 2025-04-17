@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import Logo from '@/components/Logo';
@@ -46,7 +45,7 @@ const Index = () => {
       <div className="relative w-full h-[500px] bg-football-pattern bg-cover bg-center">
         <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center">
           <div className="container mx-auto px-4">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to <span className="text-white">Football</span><span className="bg-football-gold px-2 py-1 text-black rounded-sm">hub</span></h1>
+            <h1 className="text-4xl md:text-6xl font-bold mb-4">Welcome to <span className="text-white bg-black px-4 py-2 rounded-md shadow-lg">Football<span className="bg-football-gold px-2 py-0.5 rounded-sm">hub</span></span></h1>
             <p className="text-xl md:text-2xl mb-8 max-w-2xl">Your ultimate destination for football news, videos, stats, and live streaming</p>
             <div className="flex flex-wrap gap-4">
               {!isAuthenticated && (
@@ -57,8 +56,7 @@ const Index = () => {
                 </Link>
               )}
               <Button 
-                variant="outline" 
-                className="border-white hover:border-football-gold text-lg py-6 px-8"
+                className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8"
                 onClick={() => handleAuthenticatedRoute('/live')}
               >
                 Watch Live Matches
