@@ -14,7 +14,7 @@ const Navbar: React.FC<NavbarProps> = ({ openLoginModal }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   return (

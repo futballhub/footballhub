@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -27,13 +26,12 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  const { login, register, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  // Initialize Google button when component mounts
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const loadGoogleScript = async () => {
       try {
         if (!window.google) {
@@ -42,44 +40,37 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
           script.async = true;
           script.defer = true;
           document.body.appendChild(script);
-          
-          // Wait for script to load
+
           await new Promise<void>((resolve) => {
             script.onload = () => resolve();
           });
         }
-        
-        // Initialize Google Sign-In
+
         if (window.google && googleButtonRef.current) {
           window.google.accounts.id.initialize({
             client_id: '801856078058-9jkp14gahkunnb6o6vfncdb2up4emu9g.apps.googleusercontent.com',
             callback: handleGoogleResponse,
             auto_select: false,
           });
-          
-          window.google.accounts.id.renderButton(
-            googleButtonRef.current,
-            {
-              theme: 'outline',
-              size: 'large',
-              type: 'standard',
-              text: 'signin_with',
-              shape: 'rectangular',
-              logo_alignment: 'left',
-              width: '100%',
-            }
-          );
+
+          window.google.accounts.id.renderButton(googleButtonRef.current, {
+            theme: 'outline',
+            size: 'large',
+            type: 'standard',
+            text: 'signin_with',
+            shape: 'rectangular',
+            logo_alignment: 'left',
+            width: '100%',
+          });
         }
       } catch (error) {
         console.error('Error loading Google Sign-In:', error);
       }
     };
-    
+
     loadGoogleScript();
-    
-    // Clean up
+
     return () => {
-      // Cancel One Tap prompt
       window.google?.accounts.id.cancel();
     };
   }, [isOpen, activeTab]);
@@ -89,25 +80,24 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
       setIsLoading(true);
       try {
         const success = await loginWithGoogle(response.credential);
-        
         if (success) {
           toast({
-            title: "Success!",
-            description: "You have successfully logged in with Google.",
+            title: 'Success!',
+            description: 'You have successfully logged in with Google.',
           });
           onClose();
         } else {
           toast({
-            title: "Error",
-            description: "Google login failed. Please try again.",
-            variant: "destructive",
+            title: 'Error',
+            description: 'Google login failed. Please try again.',
+            variant: 'destructive',
           });
         }
       } catch (error) {
         toast({
-          title: "Error",
-          description: "An error occurred during Google login.",
-          variant: "destructive",
+          title: 'Error',
+          description: 'An error occurred during Google login.',
+          variant: 'destructive',
         });
         console.error('Google login error:', error);
       } finally {
@@ -121,27 +111,48 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      
-      if (success) {
-        toast({
-          title: "Success!",
-          description: "You have successfully logged in.",
-        });
-        onClose();
+      const response = await fetch('http://localhost:8080/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+
+      const message = await response.text();
+
+      if (response.ok) {
+        const success = await login(email,password);
+        if (success) {
+          toast({
+            title: 'Success!',
+            description: message,
+          });
+          onClose();
+        } else {
+          toast({
+            title: 'Login failed',
+            description: 'Invalid credentials.',
+            variant: 'destructive',
+          });
+        }
       } else {
         toast({
-          title: "Login failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
+          title: 'Login failed',
+          description: message || 'Please check your credentials.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred during login.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'An error occurred during login.',
+        variant: 'destructive',
       });
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -152,26 +163,37 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
     setIsLoading(true);
 
     try {
-      const success = await register(username, email, password);
-      
-      if (success) {
+      const response = await fetch('http://localhost:8080/user/registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
         toast({
-          title: "Success!",
-          description: "Your account has been created.",
+          title: 'Success!',
+          description: 'Your account has been created.',
         });
         onClose();
       } else {
+        const data = await response.json();
         toast({
-          title: "Registration failed",
-          description: "Please try again with different information.",
-          variant: "destructive",
+          title: 'Registration failed',
+          description: data.message || 'Please try again with different information.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred during registration.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'An error occurred during registration.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -182,15 +204,20 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md bg-football-pink text-black">
         <DialogHeader className="flex justify-content-center items-center">
+          <DialogTitle className="sr-only">Authentication</DialogTitle>
           <Logo />
         </DialogHeader>
-        
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'login' | 'register')} className="w-full">
+
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as 'login' | 'register')}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="login">Sign In</TabsTrigger>
             <TabsTrigger value="register">Register</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="login">
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
@@ -221,34 +248,29 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
                   required
                 />
               </div>
-              <Button 
-                type="submit" 
-                className="w-full bg-blue-500 bg-orange-400 hover:bg-orange-500 font-bold py-2"
+              <Button
+                type="submit"
+                className="w-full bg-orange-400 hover:bg-orange-500 font-bold py-2"
                 disabled={isLoading}
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
-            
+
             <div className="mt-6 relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  OR CONTINUE WITH
-                </span>
-
+                <span className="px-2 bg-white text-gray-500">OR CONTINUE WITH</span>
               </div>
-              
             </div>
-            
+
             <div className="mt-6">
-              {/* Google Sign-In button container */}
               <div id="google-login-button" ref={googleButtonRef} className="w-full flex justify-center"></div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="register">
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
@@ -293,8 +315,8 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
                   required
                 />
               </div>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full bg-orange-400 hover:bg-orange-500 text-white font-bold py-2"
                 disabled={isLoading}
               >

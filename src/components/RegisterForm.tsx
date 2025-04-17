@@ -1,9 +1,7 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 
@@ -12,7 +10,6 @@ const RegisterForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -20,26 +17,37 @@ const RegisterForm = () => {
     setIsLoading(true);
 
     try {
-      const success = await register(username, email, password);
-      
-      if (success) {
+      const response = await fetch('http://localhost:8080/user/registration', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+        }),
+      });
+
+      if (response.ok) {
         toast({
-          title: "Success!",
-          description: "Your account has been created.",
+          title: 'Success!',
+          description: 'Your account has been created.',
         });
         navigate('/');
       } else {
+        const data = await response.json();
         toast({
-          title: "Registration failed",
-          description: "Please try again with different information.",
-          variant: "destructive",
+          title: 'Registration failed',
+          description: data.message || 'Please try again with different information.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "An error occurred during registration.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'An error occurred during registration.',
+        variant: 'destructive',
       });
     } finally {
       setIsLoading(false);
@@ -51,11 +59,11 @@ const RegisterForm = () => {
       <div className="flex justify-center mb-6">
         <Logo />
       </div>
-      <h2 className="text-2xl font-bold mb-6 text-center"></h2>
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <label htmlFor="username" className="block text-sm font-medium">
-            Username :
+            Username:
           </label>
           <Input
             id="username"
@@ -67,9 +75,10 @@ const RegisterForm = () => {
             required
           />
         </div>
+
         <div className="space-y-2">
           <label htmlFor="email" className="block text-sm font-medium">
-            Email :
+            Email:
           </label>
           <Input
             id="email"
@@ -81,9 +90,10 @@ const RegisterForm = () => {
             required
           />
         </div>
+
         <div className="space-y-2">
           <label htmlFor="password" className="block text-sm font-medium">
-            Password :
+            Password:
           </label>
           <Input
             id="password"
@@ -95,18 +105,20 @@ const RegisterForm = () => {
             required
           />
         </div>
-        <Button 
-          type="submit" 
+
+        <Button
+          type="submit"
           className="w-full bg-orange-400 hover:bg-orange-500 text-black font-bold py-2"
           disabled={isLoading}
         >
           {isLoading ? 'Registering...' : 'Register'}
         </Button>
       </form>
+
       <div className="mt-6 text-center">
         <p className="mb-2">Already have an account?</p>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           className="bg-transparent hover:bg-blue-800 text-blue-800 hover:text-white border border-blue-800 w-full"
           onClick={() => navigate('/login')}
         >
