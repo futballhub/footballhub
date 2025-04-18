@@ -6,23 +6,40 @@ const headers = {
   'X-Auth-Token': API_KEY
 };
 
+export interface Player {
+  id: number;
+  name: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  nationality: string;
+  section: string;
+  position: string | null;
+  shirtNumber: number | null;
+  lastUpdated: string;
+}
+
+export interface Team {
+  id: number;
+  name: string;
+  shortName: string;
+  tla: string;
+  crest: string;
+  address: string;
+  website: string;
+  founded: number;
+  clubColors: string;
+  venue: string;
+  lastUpdated: string;
+}
+
 export interface Match {
   id: number;
   utcDate: string;
   status: string;
   stage: string;
-  homeTeam: {
-    id: number;
-    name: string;
-    shortName: string;
-    tla: string;
-  };
-  awayTeam: {
-    id: number;
-    name: string;
-    shortName: string;
-    tla: string;
-  };
+  homeTeam: Team;
+  awayTeam: Team;
   score: {
     fullTime: {
       home: number | null;
@@ -33,12 +50,7 @@ export interface Match {
 
 export interface Standing {
   position: number;
-  team: {
-    id: number;
-    name: string;
-    shortName: string;
-    tla: string;
-  };
+  team: Team;
   playedGames: number;
   won: number;
   draw: number;
@@ -50,18 +62,28 @@ export interface Standing {
 }
 
 export interface Scorer {
-  player: {
-    id: number;
-    name: string;
-    nationality: string;
-  };
-  team: {
-    id: number;
-    name: string;
-  };
+  player: Player;
+  team: Team;
+  playedMatches: number;
   goals: number;
-  assists: number;
-  penalties: number;
+  assists: number | null;
+  penalties: number | null;
+}
+
+export interface Competition {
+  id: number;
+  name: string;
+  code: string;
+  type: string;
+  emblem: string;
+}
+
+export interface Season {
+  id: number;
+  startDate: string;
+  endDate: string;
+  currentMatchday: number;
+  winner: string | null;
 }
 
 export const footballApi = {
@@ -89,9 +111,14 @@ export const footballApi = {
     return data.standings[0].table;
   },
 
-  getScorers: async (competitionId: string): Promise<Scorer[]> => {
+  getScorers: async (competitionId: string): Promise<{ competition: Competition; season: Season; scorers: Scorer[] }> => {
     const response = await fetch(`${BASE_URL}/competitions/${competitionId}/scorers`, { headers });
     const data = await response.json();
-    return data.scorers;
+    return {
+      competition: data.competition,
+      season: data.season,
+      scorers: data.scorers
+    };
   }
 };
+

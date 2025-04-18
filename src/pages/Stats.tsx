@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import AuthModal from '@/components/AuthModal';
@@ -6,8 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQuery } from '@tanstack/react-query';
-import { footballApi, Match, Standing, Scorer } from '@/services/footballApi';
+import { footballApi } from '@/services/footballApi';
 import { format } from 'date-fns';
+import ScorersTable from '@/components/ScorersTable';
 
 const Stats = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -17,7 +17,7 @@ const Stats = () => {
     setIsAuthModalOpen(true);
   };
 
-  // Fetch data using React Query
+  // Fetch data using React Query with proper typing
   const { data: standings, isLoading: standingsLoading } = useQuery({
     queryKey: ['standings'],
     queryFn: () => footballApi.getStandings('PL'),
@@ -25,7 +25,7 @@ const Stats = () => {
 
   const { data: fixtures, isLoading: fixturesLoading } = useQuery({
     queryKey: ['fixtures'],
-    queryFn: () => footballApi.getFixtures(86), // Using Real Madrid's ID as example
+    queryFn: () => footballApi.getFixtures(86),
   });
 
   const { data: results, isLoading: resultsLoading } = useQuery({
@@ -33,19 +33,15 @@ const Stats = () => {
     queryFn: () => footballApi.getResults('PL', 11),
   });
 
-  const { data: scorers, isLoading: scorersLoading } = useQuery({
+  const { data: scorersData, isLoading: scorersLoading } = useQuery({
     queryKey: ['scorers'],
-    queryFn: () => footballApi.getScorers('PL'),
+    queryFn: () => footballApi.getScorers('SA'),
   });
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Navbar openLoginModal={openLoginModal} />
-      <AuthModal 
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        defaultTab="login"
-      />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultTab="login" />
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-4xl font-bold mb-6">Football Statistics</h1>
         
@@ -181,33 +177,13 @@ const Stats = () => {
                 <CardTitle>Top Scorers</CardTitle>
               </CardHeader>
               <CardContent>
-                {scorersLoading ? (
-                  <div className="text-center py-4">Loading top scorers...</div>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-12">Rank</TableHead>
-                        <TableHead>Player</TableHead>
-                        <TableHead>Team</TableHead>
-                        <TableHead className="text-center">Goals</TableHead>
-                        <TableHead className="text-center">Assists</TableHead>
-                        <TableHead className="text-center">Penalties</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {scorers?.map((scorer, index) => (
-                        <TableRow key={scorer.player.id}>
-                          <TableCell className="font-medium">{index + 1}</TableCell>
-                          <TableCell>{scorer.player.name}</TableCell>
-                          <TableCell>{scorer.team.name}</TableCell>
-                          <TableCell className="text-center font-bold">{scorer.goals}</TableCell>
-                          <TableCell className="text-center">{scorer.assists || 0}</TableCell>
-                          <TableCell className="text-center">{scorer.penalties || 0}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                {scorersData && (
+                  <ScorersTable 
+                    scorers={scorersData.scorers}
+                    competition={scorersData.competition}
+                    season={scorersData.season}
+                    isLoading={scorersLoading}
+                  />
                 )}
               </CardContent>
             </Card>
