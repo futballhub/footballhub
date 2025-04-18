@@ -46,23 +46,25 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
           });
         }
 
-        if (window.google && googleButtonRef.current) {
-          window.google.accounts.id.initialize({
-            client_id: '801856078058-9jkp14gahkunnb6o6vfncdb2up4emu9g.apps.googleusercontent.com',
-            callback: handleGoogleResponse,
-            auto_select: false,
-          });
+        setTimeout(() => {
+          if (window.google && googleButtonRef.current) {
+            window.google.accounts.id.initialize({
+              client_id: '801856078058-9jkp14gahkunnb6o6vfncdb2up4emu9g.apps.googleusercontent.com',
+              callback: handleGoogleResponse,
+              auto_select: false,
+            });
 
-          window.google.accounts.id.renderButton(googleButtonRef.current, {
-            theme: 'outline',
-            size: 'large',
-            type: 'standard',
-            text: 'signin_with',
-            shape: 'rectangular',
-            logo_alignment: 'left',
-            width: '100%',
-          });
-        }
+            window.google.accounts.id.renderButton(googleButtonRef.current, {
+              theme: 'outline',
+              size: 'large',
+              type: 'standard',
+              text: 'signin_with',
+              shape: 'rectangular',
+              logo_alignment: 'left',
+              width: 320,
+            });
+          }
+        }, 300);
       } catch (error) {
         console.error('Error loading Google Sign-In:', error);
       }
@@ -262,12 +264,12 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">OR CONTINUE WITH</span>
+                <span className="px-2 bg-football-pink text-gray-500">OR CONTINUE WITH</span>
               </div>
             </div>
 
             <div className="mt-6">
-              <div id="google-login-button" ref={googleButtonRef} className="w-full flex justify-center"></div>
+              <div id="google-login-button" ref={googleButtonRef} className="flex justify-center h-10"></div>
             </div>
           </TabsContent>
 
