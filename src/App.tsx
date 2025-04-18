@@ -14,46 +14,56 @@ import Videos from "./pages/Videos";
 import Stats from "./pages/Stats";
 import LiveMatches from "./pages/LiveMatches";
 import NotFound from "./pages/NotFound";
+import { useState } from "react";
 
-const queryClient = new QueryClient();
+const App = () => {
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        retry: 1,
+      },
+    },
+  }));
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/news" element={
-              <ProtectedRoute>
-                <News />
-              </ProtectedRoute>
-            } />
-            <Route path="/videos" element={
-              <ProtectedRoute>
-                <Videos />
-              </ProtectedRoute>
-            } />
-            <Route path="/stats" element={
-              <ProtectedRoute>
-                <Stats />
-              </ProtectedRoute>
-            } />
-            <Route path="/live" element={
-              <ProtectedRoute>
-                <LiveMatches />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/news" element={
+                <ProtectedRoute>
+                  <News />
+                </ProtectedRoute>
+              } />
+              <Route path="/videos" element={
+                <ProtectedRoute>
+                  <Videos />
+                </ProtectedRoute>
+              } />
+              <Route path="/stats" element={
+                <ProtectedRoute>
+                  <Stats />
+                </ProtectedRoute>
+              } />
+              <Route path="/live" element={
+                <ProtectedRoute>
+                  <LiveMatches />
+                </ProtectedRoute>
+              } />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
