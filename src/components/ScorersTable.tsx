@@ -16,6 +16,10 @@ const ScorersTable = ({ scorers, competition, season, isLoading }: ScorersTableP
     return <div className="text-center py-4">Loading top scorers...</div>;
   }
 
+  if (!scorers || scorers.length === 0) {
+    return <div className="text-center py-4">No scorer data available.</div>;
+  }
+
   return (
     <div>
       <div className="flex items-center gap-4 mb-4">
