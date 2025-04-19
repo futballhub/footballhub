@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useAuthModal } from '@/hooks/useAuthModal';
 import AuthModal from './AuthModal';
 

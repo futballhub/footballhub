@@ -1,20 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
-import AuthModal from '@/components/AuthModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Terms = () => {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  
-  const openLoginModal = () => {
-    setIsAuthModalOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-      <Navbar openLoginModal={openLoginModal} />
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultTab="login" />
+      <Navbar />
       
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-4xl font-bold mb-6">Terms of Service</h1>

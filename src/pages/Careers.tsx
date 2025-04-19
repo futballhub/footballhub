@@ -1,17 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
-import AuthModal from '@/components/AuthModal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 const Careers = () => {
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  
-  const openLoginModal = () => {
-    setIsAuthModalOpen(true);
-  };
-
   const openings = [
     {
       id: 1,
@@ -45,8 +38,7 @@ const Careers = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-      <Navbar openLoginModal={openLoginModal} />
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultTab="login" />
+      <Navbar />
       
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-4xl font-bold mb-6">Careers</h1>

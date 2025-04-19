@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Logo from './Logo';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,11 +9,9 @@ import { useAuthModal } from '@/hooks/useAuthModal';
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const { openModal } = useAuthModal();
-  const navigate = useNavigate();
-
+  
   const handleLogout = () => {
     logout();
-    navigate('/');
   };
 
   return (

@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
 import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import {
   Dialog,
@@ -27,7 +27,6 @@ const AuthModal = ({ isOpen, onClose, defaultTab = 'login' }: AuthModalProps) =>
   const [activeTab, setActiveTab] = useState<'login' | 'register'>(defaultTab);
   const googleButtonRef = useRef<HTMLDivElement>(null);
   const { login, loginWithGoogle } = useAuth();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isOpen) return;
