@@ -1,15 +1,14 @@
+
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Logo from './Logo';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
+import { useAuthModal } from '@/hooks/useAuthModal';
 
-type NavbarProps = {
-  openLoginModal: () => void;
-};
-
-const Navbar: React.FC<NavbarProps> = ({ openLoginModal }) => {
+const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
+  const { openModal } = useAuthModal();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -50,7 +49,7 @@ const Navbar: React.FC<NavbarProps> = ({ openLoginModal }) => {
           ) : (
             <Button
               className="bg-football-gold text-black hover:bg-amber-400"
-              onClick={openLoginModal}
+              onClick={() => openModal('login')}
             >
               Sign In / Register
             </Button>

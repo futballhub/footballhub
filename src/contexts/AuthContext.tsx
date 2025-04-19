@@ -1,5 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 type User = {
   id: string;
@@ -51,7 +52,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Load the Google API script when the component mounts
-    loadGoogleScript();
+    loadGoogleScript().catch(error => {
+      console.error('Failed to load Google script:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load Google authentication. Please try again later.",
+        variant: "destructive",
+      });
+    });
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
@@ -138,9 +146,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const logout = () => {
-    if (window.google && user?.provider === 'google') {
-      window.google.accounts.id.disableAutoSelect();
-    }
     setUser(null);
     localStorage.removeItem('footballhub_user');
   };

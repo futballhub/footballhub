@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from '@/components/Navbar';
 import Logo from '@/components/Logo';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,13 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import AuthModal from '@/components/AuthModal';
+import { useAuthModal } from '@/hooks/useAuthModal';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authModalTab, setAuthModalTab] = useState<'login' | 'register'>('login');
+  const { openModal } = useAuthModal();
 
   // Mock data for featured content
   const featuredMatches = [
@@ -28,38 +27,17 @@ const Index = () => {
     { id: 3, title: 'Premier League announces new broadcasting deal', image: 'https://placehold.co/300x200/png' },
   ];
 
-  const handleAuthenticatedRoute = (path: string) => {
+  const handleAuthenticatedClick = (path: string) => {
     if (!isAuthenticated) {
-      setAuthModalTab('login');
-      setIsAuthModalOpen(true);
-      return false;
+      openModal('login');
+      return;
     }
-    return true;
-  };
-
-  const openRegisterModal = () => {
-    setAuthModalTab('register');
-    setIsAuthModalOpen(true);
-  };
-
-  const openLoginModal = () => {
-    setAuthModalTab('login');
-    setIsAuthModalOpen(true);
+    navigate(path);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-      <Navbar 
-  openLoginModal={openLoginModal}
- 
-/>
-      
-      {/* Auth Modal */}
-      <AuthModal 
-        isOpen={isAuthModalOpen} 
-        onClose={() => setIsAuthModalOpen(false)}
-        defaultTab={authModalTab}
-      />
+      <Navbar />
       
       {/* Hero Section - Only shown when not authenticated */}
       {!isAuthenticated && (
@@ -72,20 +50,14 @@ const Index = () => {
                 {!isAuthenticated && (
                   <Button 
                     className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8"
-                    onClick={openRegisterModal}
+                    onClick={() => openModal('register')}
                   >
                     Register Now
                   </Button>
                 )}
                 <Button 
                   className="bg-football-gold hover:bg-amber-400 text-black text-lg py-6 px-8"
-                  onClick={() => {
-                    if (isAuthenticated) {
-                      navigate('/live');
-                    } else {
-                      openLoginModal();
-                    }
-                  }}
+                  onClick={() => handleAuthenticatedClick('/live')}
                 >
                   Watch Live Matches
                 </Button>
@@ -102,13 +74,7 @@ const Index = () => {
           <Button 
             variant="link" 
             className="text-football-gold hover:underline"
-            onClick={() => {
-              if (!isAuthenticated) {
-                openLoginModal();
-              } else {
-                navigate('/live');
-              }
-            }}
+            onClick={() => handleAuthenticatedClick('/live')}
           >
             View All
           </Button>
@@ -125,13 +91,7 @@ const Index = () => {
                 <div className="text-center text-football-gold font-medium">{match.time}</div>
                 <Button 
                   className="w-full mt-4 bg-football-pink hover:bg-pink-400 text-black"
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      openLoginModal();
-                    } else {
-                      navigate(`/live/${match.id}`);
-                    }
-                  }}
+                  onClick={() => handleAuthenticatedClick(`/live/${match.id}`)}
                 >
                   Watch Live
                 </Button>
@@ -148,13 +108,7 @@ const Index = () => {
           <Button 
             variant="link" 
             className="text-football-gold hover:underline"
-            onClick={() => {
-              if (!isAuthenticated) {
-                openLoginModal();
-              } else {
-                navigate('/news');
-              }
-            }}
+            onClick={() => handleAuthenticatedClick('/news')}
           >
             View All
           </Button>
@@ -168,13 +122,7 @@ const Index = () => {
                 <Button 
                   variant="link" 
                   className="text-football-gold p-0"
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      openLoginModal();
-                    } else {
-                      navigate(`/news/${news.id}`);
-                    }
-                  }}
+                  onClick={() => handleAuthenticatedClick(`/news/${news.id}`)}
                 >
                   Read More
                 </Button>
@@ -204,7 +152,7 @@ const Index = () => {
                     description: "Please login to subscribe to our newsletter.",
                     variant: "destructive",
                   });
-                  openLoginModal();
+                  openModal('login');
                 } else {
                   toast({
                     title: "Subscribed!",
@@ -237,17 +185,17 @@ const Index = () => {
             <div>
               <h3 className="text-xl font-bold mb-4">Content</h3>
               <ul className="space-y-2">
-                <li><Link to="/news" className="hover:text-football-gold">News</Link></li>
-                <li><Link to="/videos" className="hover:text-football-gold">Videos</Link></li>
-                <li><Link to="/stats" className="hover:text-football-gold">Stats</Link></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/news')}>News</Button></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/videos')}>Videos</Button></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/stats')}>Stats</Button></li>
               </ul>
             </div>
             <div>
               <h3 className="text-xl font-bold mb-4">Live</h3>
               <ul className="space-y-2">
-                <li><Link to="/live" className="hover:text-football-gold">Live Matches</Link></li>
-                <li><Link to="/schedule" className="hover:text-football-gold">Schedule</Link></li>
-                <li><Link to="/replays" className="hover:text-football-gold">Replays</Link></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/live')}>Live Matches</Button></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/schedule')}>Schedule</Button></li>
+                <li><Button variant="link" className="p-0 text-white hover:text-football-gold" onClick={() => handleAuthenticatedClick('/replays')}>Replays</Button></li>
               </ul>
             </div>
             <div>
