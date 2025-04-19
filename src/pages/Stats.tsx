@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import AuthModal from '@/components/AuthModal';
+<<<<<<< HEAD
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -11,15 +12,17 @@ import { format } from 'date-fns';
 import ScorersTable from '@/components/ScorersTable';
 =======
 >>>>>>> parent of dfd5ff6 (feat: Implement football stats API integration)
+=======
+>>>>>>> parent of bdcd77f (Fix: Implement Google login and stats page)
 
 const Stats = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<string>("standings");
 
   const openLoginModal = () => {
     setIsAuthModalOpen(true);
   };
 
+<<<<<<< HEAD
 <<<<<<< HEAD
   // Fetch data using React Query with proper typing
   const { data: standings, isLoading: standingsLoading } = useQuery({
@@ -293,6 +296,19 @@ const Stats = () => {
             </Card>
           </TabsContent>
         </Tabs>
+=======
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
+      <Navbar openLoginModal={openLoginModal} />
+      <AuthModal 
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        defaultTab="login"
+      />
+      <div className="container mx-auto py-12 px-4">
+        <h1 className="text-4xl font-bold mb-8">Football Statistics</h1>
+        <p className="text-xl mb-4">Comprehensive football statistics coming soon...</p>
+>>>>>>> parent of bdcd77f (Fix: Implement Google login and stats page)
       </div>
     </div>
   );
