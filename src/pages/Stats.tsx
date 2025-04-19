@@ -17,7 +17,6 @@ const Stats = () => {
     setIsAuthModalOpen(true);
   };
 
-  // Fetch data using React Query with proper typing
   const { data: standings, isLoading: standingsLoading } = useQuery({
     queryKey: ['standings'],
     queryFn: () => footballApi.getStandings('PL'),
@@ -40,7 +39,7 @@ const Stats = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
-      <Navbar openLoginModal={openLoginModal} />
+      <Navbar />
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} defaultTab="login" />
       <div className="container mx-auto py-8 px-4">
         <h1 className="text-4xl font-bold mb-6">Football Statistics</h1>
