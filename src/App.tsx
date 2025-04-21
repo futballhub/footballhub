@@ -68,7 +68,7 @@ const App = () => {
               {/* New pages */}
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/careers" element={<Careers />} />
+              <Route path="/faqs" element={<(await import("./pages/FAQs")).default />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/cookies" element={<Cookies />} />

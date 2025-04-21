@@ -41,8 +41,13 @@ const Index = () => {
       
       {/* Hero Section - Only shown when not authenticated */}
       {!isAuthenticated && (
-        <div className="relative w-full h-[500px] bg-football-pattern bg-cover bg-center ">
-          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-center ">
+        <div
+          className="relative w-full h-[500px] bg-cover bg-center"
+          style={{
+            backgroundImage: "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80')"
+          }}
+        >
+          <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-center">
             <div className="container mx-auto px-4 flex flex-col items-center">
               <h1 className="text-4xl md:text-6xl font-bold mb-3 text-center">Welcome to <span className="text-white bg-black px-4 py-2 rounded-md shadow-lg">Football<span className=" text-black bg-football-gold px-6 py-0.1 rounded-sm ">hub</span></span></h1>
               <p className="text-xl md:text-2xl mb-8 max-w-2xl text-center">Your ultimate destination for football news, videos, stats, and live streaming</p>
@@ -179,7 +184,7 @@ const Index = () => {
               <ul className="space-y-2">
                 <li><Link to="/about" className="hover:text-football-gold">About Us</Link></li>
                 <li><Link to="/contact" className="hover:text-football-gold">Contact</Link></li>
-                <li><Link to="/careers" className="hover:text-football-gold">Careers</Link></li>
+                <li><Link to="/faqs" className="hover:text-football-gold">FAQs</Link></li>
               </ul>
             </div>
             <div>
@@ -217,3 +222,5 @@ const Index = () => {
 };
 
 export default Index;
+
+// NOTE: Index.tsx is getting long; consider refactoring into smaller components for maintainability.
