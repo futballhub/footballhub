@@ -44,7 +44,7 @@ const Index = () => {
         <div
           className="relative w-full h-[500px] bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80')"
+            backgroundImage: "url(https://a.espncdn.com/photo/2024/1008/r1397740_1296x729_16-9.jpg)"
           }}
         >
           <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center text-center">
