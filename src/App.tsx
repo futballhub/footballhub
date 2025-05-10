@@ -16,12 +16,7 @@ import Videos from "./pages/Videos";
 import Stats from "./pages/Stats";
 import LiveMatches from "./pages/LiveMatches";
 import NotFound from "./pages/NotFound";
-import About from "./pages/About";
-import Contact from "./pages/Contact";
-import FAQs from "./pages/FAQs";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Cookies from "./pages/Cookies";
+
 
 const App = () => {
   const [queryClient] = useState(() => new QueryClient({
@@ -65,13 +60,6 @@ const App = () => {
                   <LiveMatches />
                 </ProtectedRoute>
               } />
-              {/* New pages */}
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/faqs" element={<FAQs />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/cookies" element={<Cookies />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
